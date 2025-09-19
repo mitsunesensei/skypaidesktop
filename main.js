@@ -27,7 +27,7 @@ function createWindow() {
   });
 
   // Load the HTML file
-  mainWindow.loadFile('skyparty2.html');
+  mainWindow.loadFile('skyparty.html');
 
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {

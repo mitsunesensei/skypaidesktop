@@ -8,7 +8,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tahoma:wght@400;700&display=swap');
@@ -30,8 +29,9 @@
         
         .desktop {
             height: 100vh;
+            width: 100vw;
             position: relative;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="%23ffffff" stroke-width="0.1" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            background: transparent;
         }
         
         .window {
@@ -39,34 +39,38 @@
             background: #ece9d8;
             border: 1px outset #ece9d8;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             min-width: 800px;
             min-height: 600px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
         
         .title-bar {
-            height: 24px;
+            height: 32px;
             background: linear-gradient(to bottom, #0a246a 0%, #0a246a 8%, #3985d6 25%, #4a95e6 65%, #1553a3 100%);
             display: flex;
             align-items: center;
-            padding: 0 4px;
+            padding: 0 6px;
             color: white;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
+            -webkit-app-region: drag;
+            cursor: move;
         }
         
         .title-bar-icon {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             background: #ff6b6b;
-            margin-right: 4px;
+            margin-right: 6px;
             border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 10px;
+            -webkit-app-region: no-drag;
         }
         
         .title-bar-text {
@@ -76,22 +80,39 @@
         .window-controls {
             display: flex;
             gap: 1px;
+            -webkit-app-region: no-drag;
         }
         
         .window-control {
-            width: 16px;
-            height: 14px;
+            width: 22px;
+            height: 18px;
             background: linear-gradient(to bottom, #e6e6e6 0%, #d0d0d0 100%);
             border: 1px outset #e6e6e6;
-            font-size: 8px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            font-weight: bold;
         }
         
         .window-control:active {
             border: 1px inset #e6e6e6;
+        }
+        
+        .window-control.minimize {
+            background: linear-gradient(to bottom, #4a90e2 0%, #357abd 100%);
+            color: white;
+        }
+        
+        .window-control.maximize {
+            background: linear-gradient(to bottom, #4a90e2 0%, #357abd 100%);
+            color: white;
+        }
+        
+        .window-control.close {
+            background: linear-gradient(to bottom, #e74c3c 0%, #c0392b 100%);
+            color: white;
         }
         
         .menu-bar {
@@ -114,7 +135,7 @@
         }
         
         .content {
-            height: calc(600px - 47px);
+            height: calc(100% - 54px);
             background: #ece9d8;
             display: flex;
             overflow: hidden;
@@ -193,11 +214,13 @@
         .xp-button {
             background: linear-gradient(to bottom, #f0f0f0 0%, #d0d0d0 100%);
             border: 1px outset #d0d0d0;
-            padding: 4px 12px;
+            padding: 8px 20px;
             font-family: 'Tahoma', sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             margin-right: 8px;
+            font-weight: bold;
+            min-width: 60px;
         }
         
         .xp-button:active {
@@ -575,26 +598,26 @@
         }
 
         .modal-title-bar {
-            height: 24px;
+            height: 28px;
             background: linear-gradient(to bottom, #0a246a 0%, #0a246a 8%, #3985d6 25%, #4a95e6 65%, #1553a3 100%);
             display: flex;
             align-items: center;
-            padding: 0 4px;
+            padding: 0 6px;
             color: white;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .modal-title-bar-icon {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             background: #4ecdc4;
-            margin-right: 4px;
+            margin-right: 6px;
             border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 12px;
         }
 
         .modal-title-bar-text {
@@ -607,15 +630,16 @@
         }
 
         .modal-window-control {
-            width: 16px;
-            height: 14px;
+            width: 20px;
+            height: 16px;
             background: linear-gradient(to bottom, #e6e6e6 0%, #d0d0d0 100%);
             border: 1px outset #e6e6e6;
-            font-size: 8px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            font-weight: bold;
         }
 
         .modal-window-control:active {
@@ -623,9 +647,9 @@
         }
 
         .modal-content {
-            padding: 16px;
-            height: calc(100% - 24px);
-            overflow-y: auto;
+            padding: 12px;
+            height: calc(100% - 28px);
+            overflow: hidden;
         }
 
         .registration-step {
@@ -665,9 +689,9 @@
 
         .modal-buttons {
             display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-top: 16px;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 12px;
         }
 
         /* Field Error Styles */
@@ -698,6 +722,58 @@
         .success-icon {
             font-size: 48px;
             margin-bottom: 16px;
+        }
+
+        /* Logout Modal Styles */
+        .logout-modal {
+            width: 400px;
+            height: 220px;
+            min-width: 400px;
+            min-height: 220px;
+            max-width: 400px;
+            max-height: 220px;
+        }
+
+        .logout-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            height: 100%;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .logout-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .logout-question {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1f4e79;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .logout-cancel {
+            padding: 10px 20px;
+            font-size: 13px;
+            min-width: 80px;
+        }
+
+        .logout-confirm {
+            padding: 10px 20px;
+            font-size: 13px;
+            min-width: 80px;
         }
 
         /* Profile Panel Styles */
@@ -967,6 +1043,65 @@
             color: #316ac5;
             font-weight: bold;
         }
+
+        /* Universal Custom Popup System */
+        .custom-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-popup {
+            background: #ece9d8;
+            border: 2px outset #ece9d8;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+            min-width: 300px;
+            max-width: 500px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .custom-popup-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .custom-popup-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1f4e79;
+            margin-bottom: 12px;
+        }
+
+        .custom-popup-message {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .custom-popup-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .custom-popup-input {
+            width: 100%;
+            height: 24px;
+            border: 1px inset #c0c0c0;
+            padding: 2px 4px;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -976,9 +1111,9 @@
                 <div class="title-bar-icon">🎮</div>
                 <div class="title-bar-text">SkyParty (Unactivated)</div>
                 <div class="window-controls">
-                    <div class="window-control">_</div>
-                    <div class="window-control">□</div>
-                    <div class="window-control">×</div>
+                    <div class="window-control minimize" onclick="minimizeWindow()">_</div>
+                    <div class="window-control maximize" onclick="maximizeWindow()">□</div>
+                    <div class="window-control close" onclick="closeWindow()">×</div>
                 </div>
             </div>
             
@@ -1174,18 +1309,6 @@
                         
                         <div style="background: linear-gradient(135deg, #32cd32, #228b22); border: 2px outset #32cd32; padding: 12px; margin-bottom: 16px; text-align: center; max-width: 300px;">
                             <button class="xp-button" style="background: linear-gradient(to bottom, #90ee90 0%, #32cd32 100%); color: black; border: 1px outset #90ee90; font-weight: bold;" onclick="launchMainGame()">🎮 Run Story Mode</button>
-                        </div>
-                        
-                        <!-- Game Launch Section -->
-                        <div class="wallet-panel">
-                            <h3 style="margin-bottom: 12px;">🎮 Launch Games</h3>
-                            <div style="margin-bottom: 12px;">
-                                <button class="xp-button" onclick="selectGameFolder()" style="margin-right: 8px;">📁 Select Game Folder</button>
-                                <button class="xp-button" onclick="launchSelectedGame()" id="launchGameBtn" disabled>🚀 Launch Game</button>
-                            </div>
-                            <div id="gamePathDisplay" style="font-size: 10px; color: #666; margin-top: 8px; display: none;">
-                                <strong>Selected Game:</strong> <span id="selectedGamePath"></span>
-                            </div>
                         </div>
                         
                         <h3 style="color: #1f4e79; margin-bottom: 12px;">🏆 Play to Earn</h3>
@@ -1906,6 +2029,33 @@
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-window logout-modal">
+            <div class="modal-content logout-content">
+                <div class="logout-icon">🚪</div>
+                <div class="logout-question">Are you sure you want to logout?</div>
+                <div class="logout-buttons">
+                    <button class="xp-button logout-cancel" onclick="closeLogoutModal()">Cancel</button>
+                    <button class="xp-button primary logout-confirm" onclick="confirmLogout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Universal Custom Popup System -->
+    <div class="custom-popup-overlay" id="customPopupOverlay">
+        <div class="custom-popup">
+            <div class="custom-popup-icon" id="customPopupIcon">ℹ️</div>
+            <div class="custom-popup-title" id="customPopupTitle">Information</div>
+            <div class="custom-popup-message" id="customPopupMessage">Message</div>
+            <input type="text" class="custom-popup-input" id="customPopupInput" style="display: none;" placeholder="Enter text...">
+            <div class="custom-popup-buttons" id="customPopupButtons">
+                <button class="xp-button" onclick="closeCustomPopup()">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -1920,18 +2070,15 @@
 
         // Initialize Firebase
         let auth;
-        let db;
         try {
             firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
-            db = firebase.firestore();
             console.log('Firebase initialized successfully');
             console.log('Firebase config:', firebaseConfig);
             
             // Test Firebase connection
             console.log('Firebase app:', firebase.app());
             console.log('Auth instance:', auth);
-            console.log('Firestore instance:', db);
             
         } catch (error) {
             console.error('Firebase initialization error:', error);
@@ -2068,68 +2215,21 @@
             document.getElementById('licenseDays').textContent = 'Unlimited';
         }
 
-        // API Base URL
-        const API_BASE_URL = 'http://localhost:3000/api';
-
-        // Local Database Username Functions
-        async function getUsernameMappings() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/username-mappings`);
-                if (response.ok) {
-                    const mappings = await response.json();
-                    console.log('Loaded username mappings from local database:', mappings);
-                    return mappings;
-                } else {
-                    throw new Error('Failed to fetch username mappings');
-                }
-            } catch (error) {
-                console.error('Error getting username mappings from local database:', error);
-                // Fallback to localStorage
-                const stored = localStorage.getItem('usernameMappings');
-                return stored ? JSON.parse(stored) : {};
-            }
+        function getUsernameMappings() {
+            const stored = localStorage.getItem('usernameMappings');
+            return stored ? JSON.parse(stored) : {};
         }
 
-        async function storeUsernameMapping(username, email) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/username-mappings`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, email })
-                });
-                
-                if (response.ok) {
-                    console.log('Stored username mapping in local database:', username, '->', email);
-                    
-                    // Also store in localStorage as backup
-                    const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
-                    mappings[username] = email;
-                    localStorage.setItem('usernameMappings', JSON.stringify(mappings));
-                } else {
-                    throw new Error('Failed to store username mapping');
-                }
-            } catch (error) {
-                console.error('Error storing username mapping in local database:', error);
-                // Fallback to localStorage
-                const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
-                mappings[username] = email;
-                localStorage.setItem('usernameMappings', JSON.stringify(mappings));
-                console.log('Stored username mapping in localStorage (fallback):', username, '->', email);
-            }
-        }
-
-        async function getEmailFromUsername(username) {
-            const mappings = await getUsernameMappings();
+        function getEmailFromUsername(username) {
+            const mappings = getUsernameMappings();
             return mappings[username] || null;
         }
 
-        async function getCurrentUsername() {
+        function getCurrentUsername() {
             if (!currentUser) return null;
             
             // Get username mappings and find the username for current user's email
-            const mappings = await getUsernameMappings();
+            const mappings = getUsernameMappings();
             for (const [username, email] of Object.entries(mappings)) {
                 if (email === currentUser) {
                     return username;
@@ -2139,9 +2239,9 @@
         }
 
         // Function to manually set username for current user (for existing accounts)
-        async function setCurrentUserUsername(username) {
+        function setCurrentUserUsername(username) {
             if (auth.currentUser) {
-                await storeUsernameMapping(username, auth.currentUser.email);
+                storeUsernameMapping(username, auth.currentUser.email);
                 console.log('Set username for current user:', username, '->', auth.currentUser.email);
                 
                 // Update UI immediately
@@ -2162,11 +2262,7 @@
                 currentUser = user.email;
                 
                 // Load saved character data and credits
-                loadCharacterData().then(() => {
-                    console.log('Character data loaded successfully');
-                }).catch(error => {
-                    console.error('Error loading character data:', error);
-                });
+                loadCharacterData();
                 
                 // Check activation status for this user
                 const activationStatus = getActivationStatus(user.email);
@@ -2185,47 +2281,36 @@
                     console.log('User is not activated');
                 }
                 
-                // Find username from email (async)
-                getUsernameMappings().then(mappings => {
-                    let displayName = user.email; // Default to email if username not found
-                    
-                    // Look for username that matches this email
-                    for (const [username, email] of Object.entries(mappings)) {
-                        if (email === user.email) {
-                            displayName = username;
-                            console.log('Found username for email:', user.email, '->', username);
-                            break;
-                        }
+                // Find username from email
+                const mappings = getUsernameMappings();
+                let displayName = null;
+                
+                // Look for username that matches this email
+                for (const [username, email] of Object.entries(mappings)) {
+                    if (email === user.email) {
+                        displayName = username;
+                        console.log('Found username for email:', user.email, '->', username);
+                        break;
                     }
-                    
-                    // If no username found, show email
-                    if (displayName === user.email) {
-                        console.log('No username mapping found for email:', user.email);
-                        console.log('Available mappings:', mappings);
-                    }
-                    
-                    // Update UI with correct username
-                    document.getElementById('userInfo').innerHTML = `
-                        <div class="user-info-avatar logged-in" id="userInfoAvatar">${localStorage.getItem('userAvatar') || '👤'}</div>
-                        <div><strong>User:</strong> ${displayName}</div>
-                        <div><strong>Status:</strong> Online</div>
-                    `;
-                    
-                    // Update profile panel
-                    document.getElementById('profileUsername').textContent = displayName;
-                }).catch(error => {
-                    console.error('Error loading username mappings:', error);
-                    // Fallback to email
-                    document.getElementById('userInfo').innerHTML = `
-                        <div class="user-info-avatar logged-in" id="userInfoAvatar">${localStorage.getItem('userAvatar') || '👤'}</div>
-                        <div><strong>User:</strong> ${user.email}</div>
-                        <div><strong>Status:</strong> Online</div>
-                    `;
-                    
-                    // Update profile panel
-                    document.getElementById('profileUsername').textContent = user.email;
-                });
+                }
+                
+                // If no username found, extract username from email (before @)
+                if (!displayName) {
+                    displayName = user.email.split('@')[0];
+                    console.log('No username mapping found for email:', user.email, 'using email prefix:', displayName);
+                    console.log('Available mappings:', mappings);
+                }
+                
+                // Update UI
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="user-info-avatar logged-in" id="userInfoAvatar">${localStorage.getItem('userAvatar') || '👤'}</div>
+                    <div><strong>User:</strong> ${displayName}</div>
+                    <div><strong>Status:</strong> Online</div>
+                `;
                 document.getElementById('userInfo').classList.add('logged-in');
+                
+                // Update profile panel
+                document.getElementById('profileUsername').textContent = displayName;
                 
                 // Set default avatar based on current character
                 updateAvatar();
@@ -2802,7 +2887,7 @@
             }
         }
 
-        async function login() {
+        function login() {
             const usernameOrEmail = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
@@ -2835,7 +2920,7 @@
             
             // If it's a username, find the corresponding email
             if (!isEmail) {
-                emailToUse = await getEmailFromUsername(usernameOrEmail);
+                emailToUse = getEmailFromUsername(usernameOrEmail);
                 if (!emailToUse) {
                     alert('Username not found. Please check your username or register a new account.');
                     return;
@@ -2935,7 +3020,7 @@
             document.getElementById(stepId).classList.add('active');
         }
 
-        async function nextRegistrationStep() {
+        function nextRegistrationStep() {
             const username = document.getElementById('regUsername').value;
             const dateOfBirth = document.getElementById('regDateOfBirth').value;
             const email = document.getElementById('regEmail').value;
@@ -2985,7 +3070,7 @@
             
             // Check if username is already taken
             if (username) {
-                const mappings = await getUsernameMappings();
+                const mappings = getUsernameMappings();
                 if (mappings[username]) {
                     showFieldError('username', 'This username is already used');
                     hasErrors = true;
@@ -3005,11 +3090,7 @@
                     console.log('Registration successful:', userCredential.user);
                     
                     // Store username-email mapping
-                    storeUsernameMapping(username, email).then(() => {
-                        console.log('Username mapping stored successfully');
-                    }).catch(error => {
-                        console.error('Error storing username mapping:', error);
-                    });
+                    storeUsernameMapping(username, email);
                     
                     // Initialize character data for new user
                     currentCharacter = 'kitty';
@@ -3033,11 +3114,7 @@
                         updateAvatar();
                         
                         // Save character data
-                        saveCharacterData().then(() => {
-                            console.log('Character data saved for new user');
-                        }).catch(error => {
-                            console.error('Error saving character data for new user:', error);
-                        });
+                        saveCharacterData();
                         
                         console.log('Updated UI with username:', username);
                     }, 100);
@@ -3209,11 +3286,7 @@
                 document.getElementById('creditsAmountSidebar').textContent = gameCredits + ' GC';
                 
                 // Save character data
-                saveCharacterData().then(() => {
-                    console.log('Character data saved after credit purchase');
-                }).catch(error => {
-                    console.error('Error saving character data after credit purchase:', error);
-                });
+                saveCharacterData();
                 
                 // Close modal
                 closeCreditsModal();
@@ -3226,101 +3299,47 @@
         currentCharacter = 'kitty'; // Default character for everyone
         ownedCharacters = ['kitty']; // Characters the user owns
 
-        // Local Database Character Data Functions
-        async function saveCharacterData() {
+        // Character and credits persistence functions
+        function saveCharacterData() {
             if (!currentUser) {
                 console.log('No current user to save character data for');
                 return;
             }
             
-            try {
-                const characterData = {
-                    email: currentUser,
-                    username: getCurrentUsername() || 'Unknown',
-                    currentCharacter: currentCharacter,
-                    ownedCharacters: ownedCharacters,
-                    gameCredits: gameCredits
-                };
-                
-                const response = await fetch(`${API_BASE_URL}/users`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(characterData)
-                });
-                
-                if (response.ok) {
-                    console.log('Saved character data to local database for user:', currentUser, characterData);
-                    
-                    // Also save to localStorage as backup
-                    const userStorageKey = `characterData_${currentUser}`;
-                    localStorage.setItem(userStorageKey, JSON.stringify({
-                        currentCharacter: currentCharacter,
-                        ownedCharacters: ownedCharacters,
-                        gameCredits: gameCredits
-                    }));
-                } else {
-                    throw new Error('Failed to save character data');
-                }
-            } catch (error) {
-                console.error('Error saving character data to local database:', error);
-                // Fallback to localStorage
-                const userStorageKey = `characterData_${currentUser}`;
-                localStorage.setItem(userStorageKey, JSON.stringify({
-                    currentCharacter: currentCharacter,
-                    ownedCharacters: ownedCharacters,
-                    gameCredits: gameCredits
-                }));
-            }
+            const characterData = {
+                currentCharacter: currentCharacter,
+                ownedCharacters: ownedCharacters,
+                gameCredits: gameCredits
+            };
+            
+            // Use user-specific storage key
+            const userStorageKey = `characterData_${currentUser}`;
+            localStorage.setItem(userStorageKey, JSON.stringify(characterData));
+            console.log('Saved character data for user:', currentUser, characterData);
         }
 
-        async function loadCharacterData() {
+        function loadCharacterData() {
             if (!currentUser) {
                 console.log('No current user to load character data for');
                 return;
             }
             
-            try {
-                const response = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(currentUser)}`);
-                
-                if (response.ok) {
-                    const characterData = await response.json();
-                    currentCharacter = characterData.currentCharacter || 'kitty';
-                    ownedCharacters = characterData.ownedCharacters || ['kitty'];
-                    gameCredits = characterData.gameCredits || 150;
-                    console.log('Loaded character data from local database for user:', currentUser, characterData);
-                } else if (response.status === 404) {
-                    // Set default values for new users
-                    currentCharacter = 'kitty';
-                    ownedCharacters = ['kitty'];
-                    gameCredits = 150;
-                    console.log('No database data found for user:', currentUser, '- using defaults');
-                    
-                    // Save defaults to database
-                    await saveCharacterData();
-                } else {
-                    throw new Error('Failed to load character data');
-                }
-            } catch (error) {
-                console.error('Error loading character data from local database:', error);
-                // Fallback to localStorage
-                const userStorageKey = `characterData_${currentUser}`;
-                const savedData = localStorage.getItem(userStorageKey);
-                
-                if (savedData) {
-                    const characterData = JSON.parse(savedData);
-                    currentCharacter = characterData.currentCharacter || 'kitty';
-                    ownedCharacters = characterData.ownedCharacters || ['kitty'];
-                    gameCredits = characterData.gameCredits || 150;
-                    console.log('Loaded character data from localStorage for user:', currentUser, characterData);
-                } else {
-                    // Set default values for new users
-                    currentCharacter = 'kitty';
-                    ownedCharacters = ['kitty'];
-                    gameCredits = 150;
-                    console.log('No saved data found for user:', currentUser, '- using defaults');
-                }
+            // Use user-specific storage key
+            const userStorageKey = `characterData_${currentUser}`;
+            const savedData = localStorage.getItem(userStorageKey);
+            
+            if (savedData) {
+                const characterData = JSON.parse(savedData);
+                currentCharacter = characterData.currentCharacter || 'kitty';
+                ownedCharacters = characterData.ownedCharacters || ['kitty'];
+                gameCredits = characterData.gameCredits || 150;
+                console.log('Loaded character data for user:', currentUser, characterData);
+            } else {
+                // Set default values for new users
+                currentCharacter = 'kitty';
+                ownedCharacters = ['kitty'];
+                gameCredits = 150;
+                console.log('No saved data found for user:', currentUser, '- using defaults');
             }
             
             // Update character database with current user's data
@@ -5754,88 +5773,184 @@
             }, 400);
         }
 
-        // Game Launching Functions for Electron
-        let selectedGamePath = null;
-
-        async function selectGameFolder() {
-            try {
-                if (window.electronAPI) {
-                    const gamePath = await window.electronAPI.selectGameFolder();
-                    if (gamePath) {
-                        selectedGamePath = gamePath;
-                        document.getElementById('selectedGamePath').textContent = gamePath;
-                        document.getElementById('gamePathDisplay').style.display = 'block';
-                        document.getElementById('launchGameBtn').disabled = false;
-                        console.log('Selected game folder:', gamePath);
-                    }
-                } else {
-                    alert('This feature is only available in the desktop app version.');
-                }
-            } catch (error) {
-                console.error('Error selecting game folder:', error);
-                alert('Error selecting game folder: ' + error.message);
-            }
+        // Logout Functions
+        function logout() {
+            // Show the logout confirmation modal instead of logging out immediately
+            document.getElementById("logoutModal").style.display = "block";
         }
 
-        async function launchSelectedGame() {
-            if (!selectedGamePath) {
-                alert('Please select a game folder first.');
-                return;
-            }
+        function closeLogoutModal() {
+            document.getElementById("logoutModal").style.display = "none";
+        }
 
-            if (!currentUser) {
-                alert('Please log in first to launch games.');
-                return;
-            }
+        function confirmLogout() {
+            // Hide modal
+            closeLogoutModal();
 
-            try {
-                if (window.electronAPI) {
-                    const userData = {
-                        username: await getCurrentUsername(),
-                        email: currentUser,
-                        currentCharacter: currentCharacter,
-                        ownedCharacters: ownedCharacters,
-                        gameCredits: gameCredits
-                    };
-
-                    const result = await window.electronAPI.launchGame(selectedGamePath, userData);
+            // Perform actual logout
+            auth.signOut()
+                .then(() => {
+                    // Reset activation UI to unactivated state
+                    document.querySelector('.title-bar-text').textContent = 'SkyParty (Unactivated)';
                     
-                    if (result.success) {
-                        console.log('Game launched successfully');
-                        // You could show a success message or minimize the launcher
-                    } else {
-                        alert('Failed to launch game: ' + result.message);
+                    // Re-enable activation code boxes
+                    for (let i = 1; i <= 4; i++) {
+                        const box = document.getElementById(`activationCode${i}`);
+                        if (box) {
+                            box.classList.remove('activated');
+                            box.disabled = false;
+                            box.value = '';
+                        }
                     }
+                    
+                    // Show activate button and hide activation status
+                    const activateBtn = document.getElementById('activateBtn');
+                    const activationStatus = document.getElementById('activationStatus');
+                    if (activateBtn) activateBtn.style.display = 'block';
+                    if (activationStatus) activationStatus.style.display = 'none';
+                    
+                    // Show activation warning
+                    const activationWarning = document.getElementById('activationWarning');
+                    if (activationWarning) activationWarning.style.display = 'block';
+                    
+                    // Update license information
+                    const licenseStatus = document.getElementById('licenseStatus');
+                    const licenseType = document.getElementById('licenseType');
+                    const licenseDays = document.getElementById('licenseDays');
+                    if (licenseStatus) {
+                        licenseStatus.textContent = 'Unactivated';
+                        licenseStatus.style.color = '#dc3545';
+                    }
+                    if (licenseType) licenseType.textContent = 'Evaluation (Limited Features)';
+                    if (licenseDays) licenseDays.textContent = '30 days';
+                    
+                    // Force switch to login panel
+                    showSection('login');
+                })
+                .catch((error) => {
+                    console.error('Logout error:', error);
+                    alert('Error logging out: ' + error.message);
+                });
+        }
+
+        // Universal Custom Popup System
+        let customPopupResolve = null;
+        let customPopupInput = null;
+
+        function showCustomAlert(message, title = "Information", icon = "ℹ️") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customPopupOverlay");
+                const popupIcon = document.getElementById("customPopupIcon");
+                const popupTitle = document.getElementById("customPopupTitle");
+                const popupMessage = document.getElementById("customPopupMessage");
+                const popupInput = document.getElementById("customPopupInput");
+                const popupButtons = document.getElementById("customPopupButtons");
+
+                popupIcon.textContent = icon;
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupInput.style.display = "none";
+                popupButtons.innerHTML = '<button class="xp-button" onclick="closeCustomPopup()">OK</button>';
+
+                customPopupResolve = resolve;
+                overlay.style.display = "flex";
+            });
+        }
+
+        function showCustomConfirm(message, title = "Confirmation", icon = "❓") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customPopupOverlay");
+                const popupIcon = document.getElementById("customPopupIcon");
+                const popupTitle = document.getElementById("customPopupTitle");
+                const popupMessage = document.getElementById("customPopupMessage");
+                const popupInput = document.getElementById("customPopupInput");
+                const popupButtons = document.getElementById("customPopupButtons");
+
+                popupIcon.textContent = icon;
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupInput.style.display = "none";
+                popupButtons.innerHTML = `
+                    <button class="xp-button" onclick="closeCustomPopup(false)">Cancel</button>
+                    <button class="xp-button primary" onclick="closeCustomPopup(true)">OK</button>
+                `;
+
+                customPopupResolve = resolve;
+                overlay.style.display = "flex";
+            });
+        }
+
+        function showCustomPrompt(message, defaultValue = "", title = "Input", icon = "✏️") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customPopupOverlay");
+                const popupIcon = document.getElementById("customPopupIcon");
+                const popupTitle = document.getElementById("customPopupTitle");
+                const popupMessage = document.getElementById("customPopupMessage");
+                const popupInput = document.getElementById("customPopupInput");
+                const popupButtons = document.getElementById("customPopupButtons");
+
+                popupIcon.textContent = icon;
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupInput.value = defaultValue;
+                popupInput.style.display = "block";
+                popupButtons.innerHTML = `
+                    <button class="xp-button" onclick="closeCustomPopup(null)">Cancel</button>
+                    <button class="xp-button primary" onclick="closeCustomPopup(customPopupInput.value)">OK</button>
+                `;
+
+                customPopupResolve = resolve;
+                customPopupInput = popupInput;
+                overlay.style.display = "flex";
+                popupInput.focus();
+            });
+        }
+
+        function closeCustomPopup(result = null) {
+            const overlay = document.getElementById("customPopupOverlay");
+            overlay.style.display = "none";
+            if (customPopupResolve) {
+                customPopupResolve(result);
+                customPopupResolve = null;
+            }
+        }
+
+        // Override native browser functions
+        window.alert = showCustomAlert;
+        window.confirm = showCustomConfirm;
+        window.prompt = showCustomPrompt;
+
+        // Window Control Functions
+        function minimizeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.invoke('minimize-window');
+            } else {
+                // Fallback for browser
+                window.blur();
+            }
+        }
+
+        function maximizeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.invoke('maximize-window');
+            } else {
+                // Fallback for browser
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
                 } else {
-                    alert('This feature is only available in the desktop app version.');
-                }
-            } catch (error) {
-                console.error('Error launching game:', error);
-                alert('Error launching game: ' + error.message);
-            }
-        }
-
-        // Check if running in Electron
-        function isElectron() {
-            return window.electronAPI !== undefined;
-        }
-
-        // Update UI based on Electron availability
-        function updateElectronUI() {
-            if (!isElectron()) {
-                // Hide or disable Electron-specific features when running in browser
-                const gameLaunchSection = document.querySelector('.wallet-panel h3');
-                if (gameLaunchSection && gameLaunchSection.textContent.includes('Launch Games')) {
-                    gameLaunchSection.parentElement.style.display = 'none';
+                    document.documentElement.requestFullscreen();
                 }
             }
         }
 
-        // Initialize Electron UI on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateElectronUI();
-        });
-
+        function closeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.invoke('close-window');
+            } else {
+                // Fallback for browser
+                window.close();
+            }
+        }
     </script>
 </body>
 </html>
