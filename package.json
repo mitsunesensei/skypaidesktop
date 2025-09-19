@@ -1,0 +1,52 @@
+{
+  "name": "skyparty-launcher",
+  "version": "1.0.0",
+  "description": "SkyParty Game Launcher - Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "electron": "electron .",
+    "electron-dev": "electron . --dev",
+    "build": "electron-builder",
+    "deploy": "railway deploy"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "game",
+    "launcher",
+    "database",
+    "sqlite"
+  ],
+  "author": "SkyParty Team",
+  "license": "MIT",
+  "build": {
+    "appId": "com.skyparty.launcher",
+    "productName": "SkyParty Game Launcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!dist/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
