@@ -2215,27 +2215,225 @@
             document.getElementById('licenseDays').textContent = 'Unlimited';
         }
 
-        function getUsernameMappings() {
-            const stored = localStorage.getItem('usernameMappings');
-            return stored ? JSON.parse(stored) : {};
+        // Wix Cloud Storage Functions
+        const WIX_SITE_URL = 'https://your-wix-site.com'; // Replace with your Wix site URL
+        
+        // ===== USER FUNCTIONS =====
+        async function getUsernameMappings() {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUsernames`);
+                const data = await response.json();
+                return data || {};
+            } catch (error) {
+                console.error('Error fetching usernames from Wix:', error);
+                // Fallback to localStorage
+                const stored = localStorage.getItem('usernameMappings');
+                return stored ? JSON.parse(stored) : {};
+            }
         }
 
-        function getEmailFromUsername(username) {
-            const mappings = getUsernameMappings();
-            return mappings[username] || null;
+        async function getEmailFromUsername(username) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserByEmail?email=${username}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching username from Wix:', error);
+                // Fallback to localStorage
+                const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
+                return mappings[username] || null;
+            }
         }
 
-        function getCurrentUsername() {
+        async function getCurrentUsername() {
             if (!currentUser) return null;
             
-            // Get username mappings and find the username for current user's email
-            const mappings = getUsernameMappings();
-            for (const [username, email] of Object.entries(mappings)) {
-                if (email === currentUser) {
-                    return username;
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserByEmail?email=${currentUser}`);
+                const username = await response.json();
+                return username;
+            } catch (error) {
+                console.error('Error fetching current username from Wix:', error);
+                // Fallback to localStorage
+                const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
+                for (const [username, email] of Object.entries(mappings)) {
+                    if (email === currentUser) {
+                        return username;
+                    }
                 }
+                return null;
             }
-            return null;
+        }
+
+        async function storeUsernameMapping(username, email) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/storeUsername`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('Username stored in Wix cloud:', username, '->', email);
+                    
+                    // Also store in localStorage as backup
+                    const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
+                    mappings[username] = email;
+                    localStorage.setItem('usernameMappings', JSON.stringify(mappings));
+                    
+                    return true;
+                } else {
+                    console.error('Error storing username in Wix:', result.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error storing username in Wix:', error);
+                // Fallback to localStorage only
+                const mappings = JSON.parse(localStorage.getItem('usernameMappings') || '{}');
+                mappings[username] = email;
+                localStorage.setItem('usernameMappings', JSON.stringify(mappings));
+                return false;
+            }
+        }
+
+        // ===== MESSAGING FUNCTIONS =====
+        async function getMessages(conversationId) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getMessages?conversationId=${conversationId}`);
+                const data = await response.json();
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching messages from Wix:', error);
+                return [];
+            }
+        }
+
+        async function sendMessage(conversationId, senderId, recipientId, content, messageType = "text") {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ conversationId, senderId, recipientId, content, messageType })
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error sending message to Wix:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // ===== SHOP FUNCTIONS =====
+        async function getShopItems(category = null) {
+            try {
+                let url = `${WIX_SITE_URL}/_functions/getShopItems`;
+                if (category) {
+                    url += `?category=${category}`;
+                }
+                const response = await fetch(url);
+                const data = await response.json();
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching shop items from Wix:', error);
+                return [];
+            }
+        }
+
+        // ===== INVENTORY FUNCTIONS =====
+        async function getUserInventory(userId) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserInventory?userId=${userId}`);
+                const data = await response.json();
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching inventory from Wix:', error);
+                return [];
+            }
+        }
+
+        async function addToInventory(userId, itemId, itemType, itemName, itemIcon, quantity, source) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/addToInventory`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId, itemId, itemType, itemName, itemIcon, quantity, source })
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error adding to inventory in Wix:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // ===== CREDITS FUNCTIONS =====
+        async function getUserCredits(userId) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserCredits?userId=${userId}`);
+                const data = await response.json();
+                return data || 0;
+            } catch (error) {
+                console.error('Error fetching user credits from Wix:', error);
+                return 0;
+            }
+        }
+
+        async function updateUserCredits(userId, amount, transactionType = "purchase") {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/updateUserCredits`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId, amount, transactionType })
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error updating user credits in Wix:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // ===== GIFT FUNCTIONS =====
+        async function sendGift(senderId, recipientId, itemType, itemData, message) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sendGift`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ senderId, recipientId, itemType, itemData, message })
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error sending gift to Wix:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function getUserGifts(userId) {
+            try {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserGifts?userId=${userId}`);
+                const data = await response.json();
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching user gifts from Wix:', error);
+                return [];
+            }
         }
 
         // Function to manually set username for current user (for existing accounts)
@@ -2253,7 +2451,7 @@
         }
 
         // Firebase Auth State Listener
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             console.log('Auth state changed - User:', user ? user.email : 'null');
             
             if (user) {
@@ -2282,16 +2480,20 @@
                 }
                 
                 // Find username from email
-                const mappings = getUsernameMappings();
                 let displayName = null;
                 
-                // Look for username that matches this email
-                for (const [username, email] of Object.entries(mappings)) {
-                    if (email === user.email) {
-                        displayName = username;
-                        console.log('Found username for email:', user.email, '->', username);
-                        break;
+                try {
+                    const mappings = await getUsernameMappings();
+                    // Look for username that matches this email
+                    for (const [username, email] of Object.entries(mappings)) {
+                        if (email === user.email) {
+                            displayName = username;
+                            console.log('Found username for email:', user.email, '->', username);
+                            break;
+                        }
                     }
+                } catch (error) {
+                    console.error('Error fetching username mappings:', error);
                 }
                 
                 // If no username found, extract username from email (before @)
@@ -3020,7 +3222,7 @@
             document.getElementById(stepId).classList.add('active');
         }
 
-        function nextRegistrationStep() {
+        async function nextRegistrationStep() {
             const username = document.getElementById('regUsername').value;
             const dateOfBirth = document.getElementById('regDateOfBirth').value;
             const email = document.getElementById('regEmail').value;
@@ -3070,9 +3272,15 @@
             
             // Check if username is already taken
             if (username) {
-                const mappings = getUsernameMappings();
-                if (mappings[username]) {
-                    showFieldError('username', 'This username is already used');
+                try {
+                    const mappings = await getUsernameMappings();
+                    if (mappings[username]) {
+                        showFieldError('username', 'This username is already used');
+                        hasErrors = true;
+                    }
+                } catch (error) {
+                    console.error('Error checking username availability:', error);
+                    showFieldError('username', 'Error checking username availability');
                     hasErrors = true;
                 }
             }
