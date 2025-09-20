@@ -2221,11 +2221,21 @@
         // ===== USER FUNCTIONS =====
         async function getUsernameMappings() {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUsernames`);
+                console.log('🔍 Testing Wix connection to:', `${WIX_SITE_URL}/_functions/getUsernames`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUsernames`);
+                console.log('📡 Wix response status:', response.status);
+                console.log('📡 Wix response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ Wix data received:', data);
                 return data || {};
             } catch (error) {
-                console.error('Error fetching usernames from Wix:', error);
+                console.error('❌ Error fetching usernames from Wix:', error);
+                console.log('🔄 Falling back to localStorage');
                 // Fallback to localStorage
                 const stored = localStorage.getItem('usernameMappings');
                 return stored ? JSON.parse(stored) : {};
@@ -2234,7 +2244,7 @@
 
         async function getEmailFromUsername(username) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserByEmail?email=${username}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUserByEmail?email=${username}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -2249,7 +2259,7 @@
             if (!currentUser) return null;
             
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserByEmail?email=${currentUser}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUserByEmail?email=${currentUser}`);
                 const username = await response.json();
                 return username;
             } catch (error) {
@@ -2267,7 +2277,7 @@
 
         async function storeUsernameMapping(username, email) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/storeUsername`, {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/storeUsername`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2303,7 +2313,7 @@
         // ===== MESSAGING FUNCTIONS =====
         async function getMessages(conversationId) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getMessages?conversationId=${conversationId}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getMessages?conversationId=${conversationId}`);
                 const data = await response.json();
                 return data || [];
             } catch (error) {
@@ -2314,7 +2324,7 @@
 
         async function sendMessage(conversationId, senderId, recipientId, content, messageType = "text") {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/sendMessage`, {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/sendMessage`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2333,7 +2343,7 @@
         // ===== SHOP FUNCTIONS =====
         async function getShopItems(category = null) {
             try {
-                let url = `${WIX_SITE_URL}/_functions/getShopItems`;
+                let url = `${WIX_SITE_URL}/_functions/sky/getShopItems`;
                 if (category) {
                     url += `?category=${category}`;
                 }
@@ -2349,7 +2359,7 @@
         // ===== INVENTORY FUNCTIONS =====
         async function getUserInventory(userId) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserInventory?userId=${userId}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUserInventory?userId=${userId}`);
                 const data = await response.json();
                 return data || [];
             } catch (error) {
@@ -2360,7 +2370,7 @@
 
         async function addToInventory(userId, itemId, itemType, itemName, itemIcon, quantity, source) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/addToInventory`, {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/addToInventory`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2379,7 +2389,7 @@
         // ===== CREDITS FUNCTIONS =====
         async function getUserCredits(userId) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserCredits?userId=${userId}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUserCredits?userId=${userId}`);
                 const data = await response.json();
                 return data || 0;
             } catch (error) {
@@ -2390,7 +2400,7 @@
 
         async function updateUserCredits(userId, amount, transactionType = "purchase") {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/updateUserCredits`, {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/updateUserCredits`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2409,7 +2419,7 @@
         // ===== GIFT FUNCTIONS =====
         async function sendGift(senderId, recipientId, itemType, itemData, message) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/sendGift`, {
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/sendGift`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2427,7 +2437,7 @@
 
         async function getUserGifts(userId) {
             try {
-                const response = await fetch(`${WIX_SITE_URL}/_functions/getUserGifts?userId=${userId}`);
+                const response = await fetch(`${WIX_SITE_URL}/_functions/sky/getUserGifts?userId=${userId}`);
                 const data = await response.json();
                 return data || [];
             } catch (error) {
